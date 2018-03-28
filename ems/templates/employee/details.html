@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<br>
+    <table class="table table-light table-bordered table-striped">
+        <tbody>
+        <tr>
+            <th>First Name</th>
+            <td>{{user.first_name}}</td>
+        </tr>
+        <tr>
+            <th>Last Name</th>
+            <td>{{user.last_name}}</td>
+        </tr>
+        <tr>
+            <th>Email Id</th>
+            <td>{{user.email}}</td>
+        </tr>
+        <tr>
+            <th>Salary</th>
+            <td>{{user.profile.salary}}</td>
+        </tr>
+        <tr>
+            <th>Designation</th>
+            <td>{{user.profile.designation}}</td>
+        </tr>
+    </tbody>
+    </table>
+    <div class="text-right">
+        <a class="btn btn-warning" href="{%  url 'employee_edit' user.id %}">Edit</a>
+        <a class="btn btn-danger" href="{%  url 'employee_delete' user.id %}">Delete</a>
+    </div>
+{% endblock content %}

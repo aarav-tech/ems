@@ -1,0 +1,29 @@
+{% load poll_extras %}
+<div class="navbar navbar-expand-lg navbar-light bg-light">
+    <span class="navbar-brand mb-0 h1">EMS</span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'employee_list' %}">
+                    {{"employee" | capfirst}}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'polls_list' %}">
+                    {{"Polls" | capfirst}} 
+                    <span class="badge badge-primary badge-pill ">{{polls_count}}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <form class="form-inline my-2 my-lg-0" method="POST" action="{% url 'user_logout' %}">
+        {% csrf_token %}
+        <a href="{% url 'my_profile' %}">
+            <span class="mr-sm-2">{{request.user.first_name}}</spans>
+        </a>
+        <input type="submit" class="btn btn-outline-danger my-2 my-sm-0" value="Logout">
+    </form>
+</div>

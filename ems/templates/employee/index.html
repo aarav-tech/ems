@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load poll_extras %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-sm-8">
+        <p>
+            <div class="float-left"><h3>List of {{title}}</h3></div>
+            {% if request.role == 'Admin' %}
+            <a class="btn btn-success float-right" href="{%  url 'employee_add' %}">Add employee</a>
+            {% endif %}
+        </p>
+        <div class="table-responsive-sm">
+        {% if users %}
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <th scope="row">
+                            {{user.first_name}} {{user.last_name}}
+                            <span class="badge badge-default">{{user.email}}</span>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-primary" href="{%  url 'employee_details' user.id %}">Details</a>
+                            <a class="btn btn-warning" href="{%  url 'employee_edit' user.id %}">Edit</a>
+                            <a class="btn btn-danger" href="{%  url 'employee_delete' user.id %}">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+        {% else %}
+            <p>There is no employee available.</p>
+        {% endif %}
+        </div>
+    </div>
+    <div class="col-sm-4">
+        {% recent_polls 1 name="hardik patel" as questions %}
+        <p>
+            <h3>Recent Polls</h3>
+        </p>
+        {% if questions %}
+        <div class="list-group">
+            {% for question in questions %}
+                <a class="list-group-item" href="{% url 'poll_details' question.id %}">{{question.title}}</a>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p>There is no poll available.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

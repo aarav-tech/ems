@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <p>
+        <h3>{{question.title}}</h3>
+    </p>
+    <div class="list-group col-md-6">
+    {% for choice in question.choices %}
+        <a class="list-group-item" href="{% url 'poll_vote' question.id %}">
+            <span class="badge badge-pill badge-primary float-right">{{choice.votes}}</span>
+            {{choice.text}}
+        </a>
+        <!-- <p> ({{choice.votes}})</p> -->
+        {% empty %}
+        <div class="list-group-item">There is no chice available for this question.</div>
+        {% endfor %}
+    </div>
+    <br>
+    <div class="col-md-12"><b>Created by: </b> {{question.created_by.first_name}}</div>
+{% endblock content %}

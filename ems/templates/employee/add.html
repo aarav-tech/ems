@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<br>
+    <form method="POST">
+        {% csrf_token %}
+        <table class="table table-bordered">
+            {{user_form.as_table}}
+        </table>
+        <br>
+        <button type="submit" class="btn btn-success float-right">Add Employee</button>
+    </form>
+{% endblock content %}
