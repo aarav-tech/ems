@@ -1,2 +1,2 @@
 django>2
-# requirements file
+djangorestframework==3.8.2

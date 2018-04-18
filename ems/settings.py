@@ -25,7 +25,7 @@ SECRET_KEY = '#c=44^9m)58=k5el2oi&0b7kr=clo%^m#5repy5ytkymok-v4e'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [*]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'poll',
-    'employee'
+    'employee',
+    'rest_framework',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
