@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.schemas import get_schema_view
+
 
 from employee.views import ( index, user_login, user_logout,
     success, ProfileUpdate, MyProfile)
@@ -23,6 +25,7 @@ urlpatterns = [
     path('', index, name='home'),
     path('admin/', admin.site.urls),
     path('poll/', include('poll.urls')),
+    path('api/v1/', include('poll.api_urls')),
     path('employee/', include('employee.urls')),
 
     path('login/', user_login, name="user_login"),

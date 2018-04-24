@@ -1,13 +1,105 @@
 from django.shortcuts import render, reverse, redirect, get_object_or_404
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView
+
+from rest_framework.parsers import JSONParser
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
 from ems.decorators import admin_hr_required, admin_only
 from poll.forms import PollForm, ChoiceForm
 from poll.models import *
+from poll.serializers import QuestionSerializer
+
+
+@csrf_exempt
+class PollView(APIView):
+    def get(self, request):
+        questions = Question.objects.all()
+        serailizer = QuestionSerializer(questions, many=True)
+        return Response(serailizer.data, status=200)
+
+    def post(self, request):
+        data = request.data
+        serializer = QuestionSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.erros, status=400)
+
+class PollDetailsView(APIView):
+    def get_object(self, id):
+        try:
+            return Question.objects.get(id=id)
+        except Question.DoesNotExist as e:
+            return Response( {"error": "Given question object not found."}, status=404)
+
+    @csrf_exempt
+    def get(self, request, id=None):
+        instance = self.get_object(id)        
+        serailizer = QuestionSerializer(instance)
+        return Response(serailizer.data)
+
+    @csrf_exempt
+    def put(self, request, id=None):
+        instance = self.get_object(id)
+        serializer = QuestionSerializer(instance, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200)
+        return Response(serializer.erros, status=400)
+
+    @csrf_exempt
+    def delete(self, request, id=None):
+        instance = self.get_object(id)
+        instance.delete()
+        return Response(status=204)
+
+@csrf_exempt
+def poll(request):
+    if request.method == "GET":
+        questions = Question.objects.all()
+        serailizer = QuestionSerializer(questions, many=True)
+        return JsonResponse(serailizer.data, safe=False)
+
+    elif request.method == "POST":
+        json_parser = JSONParser()
+        data = json_parser.parse(request)
+        serializer = QuestionSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.erros, status=400)
+
+
+@csrf_exempt
+def poll_details(request, id):
+    try:
+        instance = Question.objects.get(id=id)
+    except Question.DoesNotExist as e:
+        return JsonResponse( {"error": "Given question object not found."}, status=404)
+
+    if request.method == "GET":
+        serailizer = QuestionSerializer(instance)
+        return JsonResponse(serailizer.data)
+
+    elif request.method == "PUT":
+        json_parser = JSONParser()
+        data = json_parser.parse(request)
+        serializer = QuestionSerializer(instance, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=200)
+        return JsonResponse(serializer.erros, status=400)
+
+    elif request.method == "DELETE":
+        instance.delete()
+        return HttpResponse(status=204)
 
 
 class PollView(View):
