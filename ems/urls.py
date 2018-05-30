@@ -19,13 +19,16 @@ from rest_framework.schemas import get_schema_view
 
 
 from employee.views import ( index, user_login, user_logout,
-    success, ProfileUpdate, MyProfile)
+    success, ProfileUpdate, MyProfile, LoginView, LogoutView)
 
 urlpatterns = [
     path('', index, name='home'),
     path('admin/', admin.site.urls),
     path('poll/', include('poll.urls')),
     path('api/v1/', include('poll.api_urls')),
+    # path('api/v1/auth/', include('rest_auth.urls')),
+    path('api/v1/auth/login/', LoginView.as_view()),
+    path('api/v1/auth/logout/', LogoutView.as_view()),
     path('employee/', include('employee.urls')),
 
     path('login/', user_login, name="user_login"),

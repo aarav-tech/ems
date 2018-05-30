@@ -10,15 +10,56 @@ from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import generics
+from rest_framework import mixins
 
 from ems.decorators import admin_hr_required, admin_only
 from poll.forms import PollForm, ChoiceForm
 from poll.models import *
-from poll.serializers import QuestionSerializer
+from poll.serializers import QuestionSerializer 
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 
-@csrf_exempt
-class PollView(APIView):
+class PollListView(generics.GenericAPIView,
+                    mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin):
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
+    lookup_field = 'id'
+    authentication_classes = [TokenAuthentication, SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+
+
+    def get(self, request, id=None):
+        if id:
+            return self.retrieve(request, id)
+        else:
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    def put(self, request, id=None):
+        return self.update(request, id)
+
+    def perform_update(self, serializer):
+        print(self.request.user)
+        serializer.save(created_by=self.request.user)        
+
+    def delete(self, request, id=None):
+        return self.destroy(request, id)
+
+
+
+class PollAPIView(APIView):
     def get(self, request):
         questions = Question.objects.all()
         serailizer = QuestionSerializer(questions, many=True)
@@ -29,24 +70,23 @@ class PollView(APIView):
         serializer = QuestionSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.erros, status=400)
+            return Response(serializer.data, status=201)
+        return Response(serializer.erros, status=400)
 
-class PollDetailsView(APIView):
+class PollDetailView(APIView):
     def get_object(self, id):
         try:
             return Question.objects.get(id=id)
         except Question.DoesNotExist as e:
             return Response( {"error": "Given question object not found."}, status=404)
 
-    @csrf_exempt
     def get(self, request, id=None):
-        instance = self.get_object(id)        
+        instance = self.get_object(id)
         serailizer = QuestionSerializer(instance)
         return Response(serailizer.data)
 
-    @csrf_exempt
     def put(self, request, id=None):
+        data = request.data
         instance = self.get_object(id)
         serializer = QuestionSerializer(instance, data=data)
         if serializer.is_valid():
@@ -54,11 +94,11 @@ class PollDetailsView(APIView):
             return Response(serializer.data, status=200)
         return Response(serializer.erros, status=400)
 
-    @csrf_exempt
     def delete(self, request, id=None):
         instance = self.get_object(id)
         instance.delete()
-        return Response(status=204)
+        return HttpResponse(status=204)
+
 
 @csrf_exempt
 def poll(request):
