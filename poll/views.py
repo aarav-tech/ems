@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.edit import CreateView
+from django.db.models import Q
 
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
@@ -12,13 +13,74 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
+from rest_framework.decorators import action
 
 from ems.decorators import admin_hr_required, admin_only
 from poll.forms import PollForm, ChoiceForm
 from poll.models import *
-from poll.serializers import QuestionSerializer 
+from poll.serializers import QuestionSerializer, ChoiceSerializer, PollSearchSerializer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import FilterSet
+from django_filters import rest_framework as filters
+from haystack.query import SearchQuerySet
+
+class PollSearchViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = PollSearchSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        params = self.request.query_params
+        query = SearchQuerySet().all()
+        keywords = params.get('q')
+        if keywords:
+            query = query.filter(Q(title=keywords) | Q (created_by=keywords))
+
+        if params.get("created_by", None):
+            query = query.filter(created_by=params.get("created_by"))
+        return query
+
+class PollFilter(FilterSet):
+    tags = filters.CharFilter(method="filter_by_tags")
+
+    class Meta:
+        model = Question
+        fields =["tags"]
+
+    def filter_by_tags(self, queryset, name, value):
+        tag_names = value.strip().split(",")
+        tags = Tag.objects.filter(name__in=tag_names)
+        return queryset.filter(tags__in=tags).distinct()
+         
+
+class PollViewSet(viewsets.ModelViewSet):
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
+    lookup_field = 'id'
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = PollFilter
+
+
+    @action(detail=True, methods=["GET"])
+    def choices(self, request, id=None):
+        question = self.get_object()
+        choices = Choice.objects.filter(question=question)
+        serializer = ChoiceSerializer(choices, many=True)
+        return Response(serializer.data, status=200)
+
+    @action(detail=True, methods=["POST"])
+    def choice(self, request, id=None):
+        question = self.get_object()
+        data = request.data
+        data["question"] = question.id
+        serializer = ChoiceSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.erros, status=400)
+
 
 
 class PollListView(generics.GenericAPIView,

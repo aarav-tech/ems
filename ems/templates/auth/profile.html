@@ -26,6 +26,14 @@
                 <th>Designation</th>
                 <td>{{object.designation}}</td>
             </tr>
+            <tr>
+                <th>Profile Picture</th>
+                <td>
+                    {% if object.picture %}
+                    <img src={{object.picture.url}} height="200"/>
+                    {% endif %}
+                </td>
+            </tr>
         </tbody>
     </table>
     <div class="text-right">
