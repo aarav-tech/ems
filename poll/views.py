@@ -39,7 +39,7 @@ class PollSearchViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
             query = query.filter(Q(title=keywords) | Q (created_by=keywords))
 
         if params.get("created_by", None):
-            query = query.filter(created_by=params.get("created_by"))
+            query = query.filter(created_by__in=params.get("created_by").split(","))
         return query
 
 class PollFilter(FilterSet):

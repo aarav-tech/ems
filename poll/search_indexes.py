@@ -3,15 +3,15 @@ from haystack import indexes
 from poll.models import Question
 
 
-class QuestionIndex(indexes.SearchIndex, indexes.Indexable):
+class QuestionIndex(indexes.ModelSearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
-    title = indexes.CharField(model_attr='title')
-    created_by = indexes.EdgeNgramField(model_attr='created_by', null=True, default='')
-    created_at = indexes.EdgeNgramField(model_attr='created_at', null=True, default='')
+    id = indexes.IntegerField(model_attr='id')
+    created_by = indexes.IntegerField(model_attr='created_by__id', null=True, default=0)
 
-    def get_model(self):
-        return Question
+    class Meta:
+        model = Question
+        fields = ["text", "id", "title", "created_by", "created_at"]
 
-    def index_queryset(self, using=None):
-        """Used when the entire index for model is updated."""
-        return self.get_model().objects.all()
+    # def index_queryset(self, using=None):
+    #     """Used when the entire index for model is updated."""
+    #     return self.get_model().objects.all()

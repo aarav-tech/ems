@@ -70,7 +70,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         return instance
 
 class PollSearchSerializer(serializers.Serializer):
-    id = serializers.CharField()
+    id = serializers.IntegerField()
     title = serializers.CharField()
-    created_by = serializers.CharField()
+    created_by = serializers.IntegerField()
     created_at = serializers.DateTimeField()

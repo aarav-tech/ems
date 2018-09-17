@@ -1,0 +1,3 @@
+{{ object.title }}
+{{ object.created_by}}
+{{ object.created_at }}
