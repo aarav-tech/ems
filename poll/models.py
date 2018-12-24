@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
 
 class ObjectTracking(models.Model):
@@ -10,7 +12,15 @@ class ObjectTracking(models.Model):
         abstract = True
         ordering = ('-created_at',)
 
+class Comment(models.Model):
+    text = models.TextField(null=False, blank=False)
 
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return self.text[:20]
 
 class Tag(ObjectTracking):
     name = models.CharField(max_length=50)
@@ -41,6 +51,8 @@ class Question(ObjectTracking):
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
     tags = models.ManyToManyField(Tag)
+
+    comments = GenericRelation(Comment, related_query_name="question")
 
     objects = QuestionManager()
 
@@ -74,6 +86,8 @@ class Answer(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    comments = GenericRelation(Comment, related_query_name="answer")
 
     def __str__(self):
         return self.user.first_name + '-' + self.choice.text
