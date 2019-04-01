@@ -38,14 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'haystack',
+    # 'haystack',
 
     'poll',
     'employee',
     'rest_framework',
     'rest_framework.authtoken',
     'django_extensions',
-    'django_filters'
+    'django_filters',
+    'django_elasticsearch_dsl',
 ]
 
 MIDDLEWARE = [
@@ -149,3 +150,10 @@ HAYSTACK_CONNECTIONS = {
         'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
     },
 }
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'localhost:9200'
+    },
+}
+

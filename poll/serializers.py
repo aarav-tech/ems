@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from poll.models import Question, Choice, Tag
+from employee.serializers import EmployeeSerializer
 
 
 class ChoiceSerializer(serializers.ModelSerializer):
@@ -72,5 +73,9 @@ class QuestionSerializer(serializers.ModelSerializer):
 class PollSearchSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
-    created_by = serializers.IntegerField()
+    status = serializers.CharField()
+    created_by = EmployeeSerializer()
     created_at = serializers.DateTimeField()
+
+    class Meta:
+        model = Question

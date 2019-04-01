@@ -26,21 +26,22 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import FilterSet
 from django_filters import rest_framework as filters
-from haystack.query import SearchQuerySet
+from poll.documents import QuestionDocument
 
 class PollSearchViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = PollSearchSerializer
 
     def get_queryset(self, *args, **kwargs):
         params = self.request.query_params
-        query = SearchQuerySet().all()
-        keywords = params.get('q')
-        if keywords:
-            query = query.filter(Q(title=keywords) | Q (created_by=keywords))
+        result = QuestionDocument.search()
+        keyword = params.get('q')
+        if keyword:
+            result = result.query("match", title=keyword)
+            # result = result.query("match", created_by=keyword)
 
-        if params.get("created_by", None):
-            query = query.filter(created_by__in=params.get("created_by").split(","))
-        return query
+        # if params.get("created_by", None):
+        #     query = query.filter(created_by__in=params.get("created_by").split(","))
+        return result.to_queryset()
 
 class PollFilter(FilterSet):
     tags = filters.CharFilter(method="filter_by_tags")
