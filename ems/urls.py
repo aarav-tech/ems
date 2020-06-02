@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.schemas import get_schema_view
 from django.conf.urls.static import static
+from rest_framework_swagger.views import get_swagger_view
 
 from django.conf import settings
 
@@ -24,7 +25,10 @@ from django.conf import settings
 from employee.views import ( index, user_login, user_logout,
     success, ProfileUpdate, MyProfile, LoginView, LogoutView)
 
+schema_view = get_swagger_view(title='EMS API Documentation')
+
 urlpatterns = [
+    path('api_documentation/', schema_view),
     path('', index, name='home'),
     path('admin/', admin.site.urls),
     path('poll/', include('poll.urls')),

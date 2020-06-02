@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework_swagger',
 
     # 'haystack',
 
@@ -46,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_extensions',
     'django_filters',
-    'django_elasticsearch_dsl',
+    # 'django_elasticsearch_dsl',
 ]
 
 MIDDLEWARE = [
@@ -139,17 +140,18 @@ MEDIA_ROOT = 'media'
 
 LOGIN_URL = '/login/'
 
-HAYSTACK_CONNECTIONS = {
-    # 'default': {
-    #     'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-    #     'URL': 'http://127.0.0.1:9200/',
-    #     'INDEX_NAME': 'haystack',
-    # },
-    'default': {
-        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
-    },
+REST_FRAMEWORK = {
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.TokenAuthentication',
+       'rest_framework.authentication.BasicAuthentication',
+       'rest_framework.authentication.SessionAuthentication',
+   ),
+   'DEFAULT_PAGINATION_CLASS':
+       'rest_framework.pagination.PageNumberPagination',
+   'PAGE_SIZE': 100,
+   'ORDERING_PARAM': 'ordering',
 }
+
 
 ELASTICSEARCH_DSL={
     'default': {
@@ -157,3 +159,12 @@ ELASTICSEARCH_DSL={
     },
 }
 
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'api_key': {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+}

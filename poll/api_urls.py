@@ -13,10 +13,10 @@ poll_list_view = PollViewSet.as_view({
 })
 
 urlpatterns = [
-    path('poll/', include(router.urls)),
+    path('', include(router.urls)),
     # path('poll/', PollAPIView.as_view()),
     # path('poll/<int:id>/', PollDetailView.as_view()),
-    path('generics/poll/', poll_list_view),
-    path('generics/poll/<int:id>/', PollListView.as_view()),
-    path('poll/search/', PollSearchViewSet.as_view({'get': 'list'})),
+    # path('generics/poll/', poll_list_view),
+    # path('generics/poll/<int:id>/', PollListView.as_view()),
+    # path('poll/search/', QuestionSearchViewSet.as_view({'get': 'list'})),
 ]

@@ -18,7 +18,7 @@ from rest_framework.decorators import action
 from ems.decorators import admin_hr_required, admin_only
 from poll.forms import PollForm, ChoiceForm
 from poll.models import *
-from poll.serializers import QuestionSerializer, ChoiceSerializer, PollSearchSerializer
+from poll.serializers import QuestionSerializer, ChoiceSerializer, QuestionSearchSerializer
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework import viewsets
@@ -26,22 +26,13 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import FilterSet
 from django_filters import rest_framework as filters
-from poll.documents import QuestionDocument
 
-class PollSearchViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    serializer_class = PollSearchSerializer
+class QuestionSearchViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = QuestionSearchSerializer
 
-    def get_queryset(self, *args, **kwargs):
-        params = self.request.query_params
+    def get_queryset(self):
         result = QuestionDocument.search()
-        keyword = params.get('q')
-        if keyword:
-            result = result.query("match", title=keyword)
-            # result = result.query("match", created_by=keyword)
 
-        # if params.get("created_by", None):
-        #     query = query.filter(created_by__in=params.get("created_by").split(","))
-        return result.to_queryset()
 
 class PollFilter(FilterSet):
     tags = filters.CharFilter(method="filter_by_tags")
@@ -62,6 +53,7 @@ class PollViewSet(viewsets.ModelViewSet):
     lookup_field = 'id'
     filter_backends = (DjangoFilterBackend,)
     filter_class = PollFilter
+    authentication_classes = (TokenAuthentication,)
 
 
     @action(detail=True, methods=["GET"])

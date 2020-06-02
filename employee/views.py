@@ -116,6 +116,7 @@ class MyProfile(DetailView):
 
 
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from .serializers import LoginSerializer
 from django.contrib.auth import login as django_login, logout as django_logout
 from rest_framework.authtoken.models import Token
@@ -129,7 +130,9 @@ from django_filters import FilterSet
 from django_filters import rest_framework as filters
 
 
-class LoginView(APIView):
+class LoginView(GenericAPIView):
+    serializer_class = LoginSerializer
+    
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

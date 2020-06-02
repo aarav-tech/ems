@@ -41,9 +41,11 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         choices = validated_data.pop('choices')
+        tags = validated_data.pop('tags')
         question = Question.objects.create(**validated_data)
         for choice in choices:
             Choice.objects.create(**choice, question=question)
+        question.tags.set(tags)
         return question
 
     def update(self, instance, validated_data):
@@ -70,12 +72,9 @@ class QuestionSerializer(serializers.ModelSerializer):
 
         return instance
 
-class PollSearchSerializer(serializers.Serializer):
+
+class QuestionSearchSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     title = serializers.CharField()
     status = serializers.CharField()
-    created_by = EmployeeSerializer()
     created_at = serializers.DateTimeField()
-
-    class Meta:
-        model = Question

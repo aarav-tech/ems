@@ -1,21 +1,20 @@
-from django_elasticsearch_dsl import DocType, Index, fields
+from django_elasticsearch_dsl import DocType, Index
 from .models import Question
 
-question = Index('questions')
-question.settings(
+
+questions = Index('questions')
+questions.settings(
     number_of_shards=1,
     number_of_replicas=0
 )
 
-@question.doc_type
+@questions.doc_type
 class QuestionDocument(DocType):
-
     class Meta:
         model = Question
         fields = [
+            'id',
             'title',
             'status',
-            # 'created_by',
-            'start_date',
-            'end_date'
+            'created_at'
         ]
