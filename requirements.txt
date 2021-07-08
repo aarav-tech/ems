@@ -6,3 +6,4 @@ django-filter==1.1.0
 whoosh
 django-haystack
 django-elasticsearch-dsl
+django-rest-swagger

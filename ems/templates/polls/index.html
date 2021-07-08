@@ -11,17 +11,17 @@
             <table class="table table-bordered">
                 <thead class="thead-light">
                     <tr>
-                        <th>Poll</th>
+                        <th width="50%">Poll</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for question in questions %}
                     <tr>
-                        <th scope="row">
+                        <td scope="row">
                             {{question.title}}
                         </td>
-                        <td class="text-center">
+                        <td>
                             <a class="btn btn-primary" href="{%  url 'poll_details' question.id %}">Details</a>
                             <a class="btn btn-warning" href="{%  url 'poll_edit' question.id %}">Edit</a>
                             <a class="btn btn-danger" href="{%  url 'poll_delete' question.id %}">Delete</a>

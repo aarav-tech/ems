@@ -45,3 +45,5 @@ urlpatterns = [
     path('profile/', MyProfile.as_view(), name="my_profile"),
     path('profile/update', ProfileUpdate.as_view(), name="update_profile"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
